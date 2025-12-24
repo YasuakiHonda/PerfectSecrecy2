@@ -11,24 +11,13 @@ open PMF
 
 variable {M K C : Type}
 
-/-!
-### Two-time encryption with two keys
-
-We model two-time encryption as a single encryption algorithm
-that takes *two keys* and *two messages* at once.
--/
-
 /-- Two-time encryption algorithm using two (possibly equal) keys. -/
 def Enc₂ (Enc : K → M → C) : (K × K) → (M × M) → (C × C)
 | (k₁, k₂), (m₁, m₂) => (Enc k₁ m₁, Enc k₂ m₂)
 
-/-!
-### Key generation strategies
-We distinguish security properties solely by the *key distribution*.
--/
 
 /-- Independent key generation for two-time encryption.
-Keys are sampled twice independently from `Gen`. -/
+Keys are sampled twice independently from Gen. -/
 noncomputable
 def Gen_indep (Gen : PMF K) : PMF (K × K) := do
   let k₁ ← Gen
@@ -62,26 +51,16 @@ lemma Enc_dist_two_time_indep
   PMF.prod
     (Enc_dist Enc Gen m.1)
     (Enc_dist Enc Gen m.2) := by
-  -- unfold all *definitions*, but stop before probabilities
   unfold Enc_dist Enc₂ Gen_indep PMF.prod
   ext ⟨c₁, c₂⟩
   cases m with
   | mk m₁ m₂ =>
     simp [Bind.bind]
 
-/-!
-### Theorems
-
-We compare the two key generation strategies under the *same*
-two-time encryption algorithm `Enc₂`.
-
-* Independent keys preserve perfect secrecy.
-* Key reuse breaks perfect secrecy.
--/
 
 /-- Perfect secrecy is preserved under two-time encryption
 when keys are generated independently. -/
-theorem ind_perfect_secrecy_two_time_indep
+theorem ind_perfect_secrecy_two_time_indep_key
   (Enc : K → M → C)
   (Gen : PMF K) :
   ind_perfect_secrecy Enc Gen →

@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2025 Yasuaki Honda. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yasuaki Honda
+-/
 import PerfectSecrecy2.Defs
 
 namespace PerfectSecrecy.KeySize
@@ -10,7 +15,7 @@ variable [Fintype M] [Inhabited M] [DecidableEq M]
 variable [Fintype K]
 variable [DecidableEq C]
 
-/- Theorem: In any symmetric encryption scheme (Enc, Dec, Gen) that achieves
+/-- Theorem: In any symmetric encryption scheme (Enc, Dec, Gen) that achieves
 indistinguishability-based perfect secrecy and correctness, the size of the key space K
 must be at least as large as the size of the message space M. -/
 theorem K_GE_M (Enc : K → M → C) (Dec : K → C → M) (Gen : PMF K)

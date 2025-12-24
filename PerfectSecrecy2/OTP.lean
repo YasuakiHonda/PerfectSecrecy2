@@ -98,7 +98,7 @@ algorithm, Gen_reuse in the above and the Gen_indep in the below.
 -/
 example (n : ℕ) [NeZero n] [Fintype (BitVec n)] :
     ind_perfect_secrecy (Enc₂ (OTP_Enc n)) (Gen_indep OTP_Gen) := by
-  refine ind_perfect_secrecy_two_time_indep (OTP_Enc n) OTP_Gen ?_
+  refine ind_perfect_secrecy_two_time_indep_key (OTP_Enc n) OTP_Gen ?_
   exact OTP_is_ind_perfectly_secret
 
 end KeyReuse

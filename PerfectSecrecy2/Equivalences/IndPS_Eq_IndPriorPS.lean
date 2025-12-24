@@ -17,7 +17,7 @@ variable [Inhabited M]
 /-- Theorem: Indistinguishability-based perfect secrecy implies
 indistinguishability-based perfect secrecy for prior message
 distributions. -/
-theorem ind_perfect_secrecy_of_ind_prior_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
+theorem ind_prior_perfect_secrecy_of_ind_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
     (h_ind : ind_perfect_secrecy Enc Gen) :
     ind_prior_perfect_secrecy Enc Gen := by
 
@@ -75,9 +75,10 @@ end WithDefaultMessage
 
 
 section NoDefaultMessage
+
 /-- Theorem: Indistinguishability-based perfect secrecy for prior message
 distributions implies indistinguishability-based perfect secrecy. -/
-theorem ind_perfect_secrecy_of_ind_prior_perfect_secrecy_rev (Enc : K → M → C) (Gen : PMF K)
+theorem ind_perfect_secrecy_of_ind_prior_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
     (h_prior_ind : ind_prior_perfect_secrecy Enc Gen) :
     ind_perfect_secrecy Enc Gen := by
 
@@ -124,8 +125,8 @@ indistinguishability-based perfect secrecy for prior message distributions. -/
 theorem ind_perfect_secrecy_equiv_ind_prior_perfect_secrecy (Enc : K → M → C) (Gen : PMF K) :
   ind_perfect_secrecy Enc Gen ↔ ind_prior_perfect_secrecy Enc Gen := by
   constructor
+  · exact ind_prior_perfect_secrecy_of_ind_perfect_secrecy Enc Gen
   · exact ind_perfect_secrecy_of_ind_prior_perfect_secrecy Enc Gen
-  · exact ind_perfect_secrecy_of_ind_prior_perfect_secrecy_rev Enc Gen
 
 end WithDefaultMessage
 

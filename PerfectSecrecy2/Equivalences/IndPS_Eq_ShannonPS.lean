@@ -19,8 +19,6 @@ This lemma is used in the both directions of the proof.
 -/
 lemma h_joint_eq_prior_times_enc (Enc : K → M → C) (Gen : PMF K) (m : M) (c : C) (Msg : PMF M) :
     (joint_dist Enc Gen Msg) (m, c) = (Msg m) * (Enc_dist Enc Gen m) c := by
-  -- joint_dist の定義を展開する (PMFのbind/do構文の展開)
-  -- (m, c) の確率 = P(m) * P(c|m)
   simp only [joint_dist, Bind.bind, PMF.bind_apply]
 
   /- h_inner_dist can be used to rewrite the inner sum in the goal.
@@ -56,7 +54,7 @@ variable [Inhabited M]
 /-- Theorem: Indistingushability-based perfect secrecy implies
 Shannon's definition of perfect secrecy.
 -/
-theorem ind_perfect_secrecy_impl_shannon_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
+theorem shannon_perfect_secrecy_of_ind_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
     (h_ind : ind_perfect_secrecy Enc Gen) :
     shannon_perfect_secrecy Enc Gen := by
 
@@ -111,7 +109,7 @@ variable [Fintype M]
 
 /-- Theorem: Shannon's definition of perfect secrecy implies Indistingushable perfect secrecy.
 -/
-theorem shannon_perfect_secrecy_impl_ind_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
+theorem ind_perfect_secrecy_of_shannon_perfect_secrecy (Enc : K → M → C) (Gen : PMF K)
   (h_shannon : shannon_perfect_secrecy Enc Gen) :
     ind_perfect_secrecy Enc Gen := by
 
@@ -173,8 +171,8 @@ Shannon's definition of perfect secrecy. -/
 theorem ind_perfect_secrecy_equiv_shannon_perfect_secrecy (Enc : K → M → C) (Gen : PMF K) :
   ind_perfect_secrecy Enc Gen ↔ shannon_perfect_secrecy Enc Gen := by
   constructor
-  · exact ind_perfect_secrecy_impl_shannon_perfect_secrecy Enc Gen
-  · exact shannon_perfect_secrecy_impl_ind_perfect_secrecy Enc Gen
+  · exact shannon_perfect_secrecy_of_ind_perfect_secrecy Enc Gen
+  · exact ind_perfect_secrecy_of_shannon_perfect_secrecy Enc Gen
 
 end WithDefaultMessage
 
