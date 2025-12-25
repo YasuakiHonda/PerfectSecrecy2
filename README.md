@@ -2,7 +2,17 @@
 
 This repository contains a Lean4 formalization of **perfect secrecy** for symmetric-key encryption, based on **Shannon’s information-theoretic definition** and its modern equivalents.
 
-The development is carried out using **probability mass functions (PMFs)** and **game-based formulations**, with the goal of making classical results about perfect secrecy precise, modular, and machine-checked.
+The development is carried out using **probability mass functions (PMFs)**, with the goal of making classical results about perfect secrecy precise, modular, and machine-checked.
+
+---
+
+## How to use this repo
+1. Download the zip file that contains all the files in this repo using the '**Download ZIP**' feature under the **Code** button.
+2. Unzip the downloaded zip file.
+3. cd into the directory created by the unzip above.
+4. lake clean; lake update; lake exe cache get; lake build
+
+Now you can open the directory using VSCode to start playing around this repo.
 
 ---
 
