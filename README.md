@@ -41,16 +41,23 @@ Namespaces and sections are used to make logical dependencies explicit and local
 ---
 
 ## Repository Structure
+```text
+.
+├── lake-manifest.json
+├── lakefile.toml
+├── lean-toolchain
+├── PerfectSecrecy2
+│   ├── Defs.lean
+│   ├── Equivalences
+│   │   ├── IndPS_Eq_IndPriorPS.lean
+│   │   └── IndPS_Eq_ShannonPS.lean
+│   ├── KeyReuse.lean
+│   ├── KeySize.lean
+│   └── OTP.lean
+├── PerfectSecrecy2.lean
+└── README.md
 
-PerfectSecrecy2/
-Defs.lean
-Equivalences/
-IndPS_Eq_IndPriorPS.lean
-IndPS_Eq_ShannonPS.lean
-KeyReuse.lean
-KeySize.lean
-OTP.lean
-
+```
 
 ---
 
