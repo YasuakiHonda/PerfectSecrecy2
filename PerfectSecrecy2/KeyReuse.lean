@@ -46,11 +46,10 @@ lemma Enc_dist_two_time_indep
   (Enc : K → M → C)
   (Gen : PMF K)
   (m : M × M) :
-  Enc_dist (Enc₂ Enc) (Gen_indep Gen) m
-    =
-  PMF.prod
-    (Enc_dist Enc Gen m.1)
-    (Enc_dist Enc Gen m.2) := by
+  Enc_dist (Enc₂ Enc) (Gen_indep Gen) m =
+      PMF.prod
+        (Enc_dist Enc Gen m.1)
+        (Enc_dist Enc Gen m.2) := by
   unfold Enc_dist Enc₂ Gen_indep PMF.prod
   ext ⟨c₁, c₂⟩
   cases m with
@@ -64,7 +63,7 @@ theorem ind_perfect_secrecy_two_time_indep_key
   (Enc : K → M → C)
   (Gen : PMF K) :
   ind_perfect_secrecy Enc Gen →
-  ind_perfect_secrecy (Enc₂ Enc) (Gen_indep Gen) := by
+    ind_perfect_secrecy (Enc₂ Enc) (Gen_indep Gen) := by
 
   intro h_ind_PS m₁ m₂ c
   -- c : C × C
@@ -96,7 +95,7 @@ theorem ind_perfect_secrecy_broken_two_time_same_key
   (Gen : PMF K)
   (h_inj_enc : ∀ k : K, Function.Injective (Enc k))
   (hM : ∃ m₁ m₂ : M, m₁ ≠ m₂) :
-  ¬ ind_perfect_secrecy (Enc₂ Enc) (Gen_reuse Gen) := by
+    ¬ ind_perfect_secrecy (Enc₂ Enc) (Gen_reuse Gen) := by
   intro hPS2
   rcases hM with ⟨m₁, m₂, hneq⟩
 

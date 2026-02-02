@@ -132,8 +132,6 @@ theorem ind_perfect_secrecy_of_shannon_perfect_secrecy (Enc : K → M → C) (Ge
       have h_enc_zero (m : M) : (Enc_dist Enc Gen m) c = 0 := by
         unfold cipher_dist at h_cipher_zero
         simp only [Bind.bind, PMF.bind_apply] at h_cipher_zero
-        have : Msg m * (Enc_dist Enc Gen m) c ≥ 0 := by
-          exact zero_le (Msg m * (Enc_dist Enc Gen m) c)
         rw [ENNReal.tsum_eq_zero] at h_cipher_zero
         exact (mul_eq_zero_iff_left (h_Msg_pos m)).mp (h_cipher_zero m)
       rw [h_enc_zero m1, h_enc_zero m2]
