@@ -5,6 +5,7 @@ Authors: Yasuaki Honda
 -/
 
 import Mathlib.Probability.ProbabilityMassFunction.Monad
+import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
 namespace PerfectSecrecy
 
@@ -89,5 +90,16 @@ def shannon_perfect_secrecy (Enc : K → M → C) (Gen : PMF K) : Prop :=
   ∀ (Msg : PMF M) (m : M) (c : C),
     (cipher_dist Enc Gen Msg) c ≠ 0 → posterior Enc Gen Msg m c = Msg m
 
+/-- Perfect Indistinguishability (Probabilistic Adversary).
+    The adversary A is a probabilistic algorithm `C → PMF Bool`. -/
+def perfect_indistinguishability (Enc : K → M → C) (Gen : PMF K) : Prop :=
+  ∀ (m1 m2 : M) (A : C → PMF Bool),
+    (Enc_dist Enc Gen m1).bind A = (Enc_dist Enc Gen m2).bind A
+
+/-- Perfect Simulatability (Probabilistic Adversary).
+    The adversary A is a probabilistic algorithm `C → PMF V`. -/
+def perfect_simulatability (Enc : K → M → C) (Gen : PMF K) : Prop :=
+  ∀ (V : Type) (A : C → PMF V), ∃ (S : PMF V), ∀ (Msg : PMF M),
+    (cipher_dist Enc Gen Msg).bind A = S
 
 end PerfectSecrecy
