@@ -76,7 +76,7 @@ theorem perfect_simulatability_imp_perfect_indistinguishability
   rcases h_sim Bool A with ⟨S, h_S⟩
   have h1 := h_S (PMF.pure m1)
   have h2 := h_S (PMF.pure m2)
-  simp only [cipher_dist, Bind.bind, PMF.pure_bind] at h1 h2
+  simp only [cipher_dist, Bind.bind, PMF.pure_bind] at h1 h2 ⊢
   rw [h1, h2]
 
 /--
