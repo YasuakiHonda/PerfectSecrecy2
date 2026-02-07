@@ -23,24 +23,11 @@ theorem K_GE_M (Enc : K → M → C) (Dec : K → C → M) (Gen : PMF K)
       (h_ind_PS : ind_perfect_secrecy Enc Gen) :
     Fintype.card K ≥ Fintype.card M := by
 
-  have pmf_of_fintype_exists_ne_zero {T : Type} [Fintype T] (Gen : PMF T) : ∃ t : T, Gen t ≠ 0 := by
-    by_contra hzero
-    push_neg at hzero
-    have : (∑' t : T, Gen t) = 0 := by simp [hzero]
-    have : (1 : ENNReal) = 0 := by simp [Gen.tsum_coe] at this
-    exact one_ne_zero this
-
   by_contra K_M
   push_neg at K_M
 
-  /- We fix an arbitrary message m₀ ∈ M and an arbitrary key k₀ ∈ K.
-  We then consider the ciphertext c₀ = Enc(k₀, m₀). Next, we define the set S₀
-  of all messages that can be obtained by decrypting c₀ with every possible key in K.
-  Since the size of K is smaller than the size of M, there must exist at least one
-  message m₁ ∈ M that is not in S₀.
-  -/
   have m₀:M := default
-  obtain ⟨k₀, hk₀⟩:= pmf_of_fintype_exists_ne_zero Gen
+  obtain ⟨k₀, hk₀⟩:= Gen.support_nonempty
   -- have k₀:K := default
   let c₀:C := Enc k₀ m₀
   have hc₀ : c₀=Enc k₀ m₀ := by rfl

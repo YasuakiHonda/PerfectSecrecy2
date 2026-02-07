@@ -99,16 +99,7 @@ theorem ind_perfect_secrecy_broken_two_time_same_key
   intro hPS2
   rcases hM with ⟨m₁, m₂, hneq⟩
 
-  have pmf_exists_ne_zero (Gen : PMF K) : ∃ k : K, Gen k ≠ 0 := by
-    by_contra hzero
-    push_neg at hzero
-
-    have : (∑' k : K, Gen k) = 0 := by simp [hzero]
-    have : (1 : ENNReal) = 0 := by simp [Gen.tsum_coe] at this
-
-    exact one_ne_zero this
-
-  obtain ⟨k, hk⟩ := pmf_exists_ne_zero Gen
+  obtain ⟨k, hk⟩ := Gen.support_nonempty
 
   -- choose two plaintext pairs
   let msg₁ := (m₁, m₁)
@@ -122,6 +113,8 @@ theorem ind_perfect_secrecy_broken_two_time_same_key
     unfold Enc_dist Enc₂ Gen_reuse
     simp [Bind.bind]
     use k
+    exact ⟨by simp [h_c, h_msg₁], hk⟩
+
 
   have h_zero : (Enc_dist (Enc₂ Enc) (Gen_reuse Gen) msg₂) c = 0 := by
     unfold Enc_dist Enc₂ Gen_reuse
@@ -130,13 +123,10 @@ theorem ind_perfect_secrecy_broken_two_time_same_key
     intro kk
     rw [mul_eq_zero]
     split_ifs with h_c_enc
-    · simp
+    · simp only [mul_ite, mul_one, mul_zero, ENNReal.tsum_eq_zero,
+                ite_eq_right_iff, one_ne_zero, or_false]
       intro i h_kk_i
-      simp [h_kk_i, h_msg₂,h_c] at h_c_enc
-      have h_c_enc_2 := h_c_enc.2
-      rw [h_c_enc.1] at h_c_enc_2
-      apply h_inj_enc at h_c_enc_2
-      contradiction
+      grind
     · right; rfl
 
   have hPS2m1m2 := hPS2 msg₁ msg₂ c
