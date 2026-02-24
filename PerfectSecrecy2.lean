@@ -4,3 +4,7 @@ import PerfectSecrecy2.KeySize
 import PerfectSecrecy2.OTP
 import PerfectSecrecy2.Equivalences.IndPS_Eq_IndPriorPS
 import PerfectSecrecy2.Equivalences.IndPS_Eq_ShannonPS
+import PerfectSecrecy2.GuessingGame.PerfectSecrecy
+import PerfectSecrecy2.GuessingGame.SmallKeySpace
+import PerfectSecrecy2.GuessingGame.BitStringCase
+import PerfectSecrecy2.GuessingGame.ENNRealCalc

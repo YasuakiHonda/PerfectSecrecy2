@@ -1,6 +1,13 @@
+/-
+Copyright (c) 2025 Yasuaki Honda. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yasuaki Honda
+-/
+
 import Mathlib.Data.ENNReal.Operations
 import Mathlib.Data.ENNReal.Inv
 
+/-- Helper lemma: `(1/2) * A ≠ ⊤` whenever `A ≤ 1`. -/
 lemma half_A_ne_top (A : ENNReal) (h_A_le_one : A ≤ 1) : (1/2:ENNReal) * A ≠ ⊤ := by
   rw [ne_eq]
   rw [ENNReal.mul_eq_top]
@@ -11,12 +18,13 @@ lemma half_A_ne_top (A : ENNReal) (h_A_le_one : A ≤ 1) : (1/2:ENNReal) * A ≠
   rw [h] at h_A_le_one
   contradiction
 
+/-- Helper lemma: `(1/2 : ENNReal) ≠ ⊤`. -/
 lemma half_ne_top : (1/2:ENNReal) ≠ ⊤ := by norm_num
 
 /--
-1 / 2 * (1 - A) + A = 1 / 2 + A / 2
+Arithmetic identity in ENNReal:
+`1 / 2 * (1 - A) + A = 1 / 2 + A / 2`, valid when `A ≤ 1`.
 -/
-
 lemma formula1 (A : ENNReal) (h_A_le_one : A ≤ 1) : 1 / 2 * (1 - A) + A = 1 / 2 + A / 2 := by
   rw [ENNReal.mul_sub,mul_one]
   · rw [ENNReal.sub_add_eq_add_sub]
@@ -49,14 +57,16 @@ lemma formula1 (A : ENNReal) (h_A_le_one : A ≤ 1) : 1 / 2 * (1 - A) + A = 1 / 
   · exact fun a a_1 ↦ half_ne_top
 
 /--
-(1 - A) * (1 / 2) + A = 1 / 2 + A / 2
+Arithmetic identity in ENNReal:
+`(1 - A) * (1 / 2) + A = 1 / 2 + A / 2`, valid when `A ≤ 1`.
 -/
 lemma formula2 (A : ENNReal) (h_A_le_one : A ≤ 1) : (1 - A) * (1 / 2) + A = 1 / 2 + A / 2 := by
   rw [mul_comm]
   exact formula1 A h_A_le_one
 
 /--
-1 / 2 * (1 / 2) + (1 / 2 * (1 / 2) + 1 / 2 * (A / 2)) = 1 / 2 + A / 4
+Arithmetic identity in ENNReal:
+`1 / 2 * (1 / 2) + (1 / 2 * (1 / 2) + 1 / 2 * (A / 2)) = 1 / 2 + A / 4`.
 -/
 lemma formula3 (A : ENNReal) :
         1 / 2 * (1 / 2) + (1 / 2 * (1 / 2) + 1 / 2 * (A / 2)) = 1 / 2 + A / 4 := by
@@ -76,8 +86,9 @@ lemma formula3 (A : ENNReal) :
     rw [← ENNReal.mul_div_mul_comm] <;> norm_num
   · norm_num
 
-/-- 1/2 + 1/8 = 5/8 -/
+/-- Arithmetic identity: `(5/8 : ENNReal) = 1/2 + 1/8`. -/
 lemma formula58 : (5/8 : ENNReal) = 1/2 + 1/8 := by
+  -- Cast to NNReal to use norm_cast and ring
   have : (5/8 : ENNReal)=(5/8 : NNReal) := by
     simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, ENNReal.coe_div, ENNReal.coe_ofNat]
   rw [this]
@@ -91,8 +102,9 @@ lemma formula58 : (5/8 : ENNReal) = 1/2 + 1/8 := by
   rw [this]
   norm_cast; ring
 
-/-- (1/8:ENNReal) = (1/2)/4 -/
+/-- Arithmetic identity: `(1/8 : ENNReal) = (1/2) / 4`. -/
 lemma formula124 : (1/8:ENNReal) = (1/2)/4 := by
+  -- Cast to NNReal to use norm_cast and ring
   have : (1/8:ENNReal) = (1/8:NNReal) := by
     simp only [one_div, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, ENNReal.coe_inv,
       ENNReal.coe_ofNat]
