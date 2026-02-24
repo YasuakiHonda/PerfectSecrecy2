@@ -2,8 +2,13 @@ import PerfectSecrecy2.Defs
 import PerfectSecrecy2.KeyReuse
 import PerfectSecrecy2.KeySize
 import PerfectSecrecy2.OTP
+
 import PerfectSecrecy2.Equivalences.IndPS_Eq_IndPriorPS
 import PerfectSecrecy2.Equivalences.IndPS_Eq_ShannonPS
+import PerfectSecrecy2.Equivalences.IndPS_Eq_PerfectInd
+import PerfectSecrecy2.Equivalences.PerfectInd_Eq_PerfectSimulation
+
+import PerfectSecrecy2.GuessingGame.Defs
 import PerfectSecrecy2.GuessingGame.PerfectSecrecy
 import PerfectSecrecy2.GuessingGame.SmallKeySpace
 import PerfectSecrecy2.GuessingGame.BitStringCase

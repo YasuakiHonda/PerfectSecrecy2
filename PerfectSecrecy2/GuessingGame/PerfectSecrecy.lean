@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yasuaki Honda
 -/
 import PerfectSecrecy2.Defs
+import PerfectSecrecy2.GuessingGame.Defs
 import Mathlib.Probability.ProbabilityMassFunction.Basic
 
 namespace PerfectSecrecy.GuessingGame
@@ -11,18 +12,6 @@ namespace PerfectSecrecy.GuessingGame
 variable {K M C : Type}
 
 open PerfectSecrecy
-
-/--
-The guessing game (IND-CPA style) as a PMF over Bool.
-A bit `b` is chosen uniformly; the adversary sees an encryption of `m_b`
-and outputs a guess `b'`. The outcome is `true` if `b' = b`.
--/
-noncomputable
-def guessingGame (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) (A : C → PMF Bool) : PMF Bool := do
-  let b ← PMF.bernoulli (1/2) (by norm_num)
-  let c ← Enc_dist Enc Gen (if b then m1 else m0)
-  let b' ← A c
-  pure (b' == b)
 
 /--
 If a cipher satisfies `perfect_indistinguishability`, then for any adversary `A`
@@ -42,14 +31,7 @@ theorem success_prob_eq_half
   simp only [one_div, cond_false, ENNReal.coe_sub, ENNReal.coe_one, ne_eq, OfNat.ofNat_ne_zero,
     not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_ofNat, ENNReal.one_sub_inv_two,
     Bool.false_eq_true, ↓reduceIte, decide_true, Bool.true_eq_false, decide_false, cond_true]
-
-  -- Simplify PMF.pure applied to Bool: (pure true) true = 1, (pure false) true = 0
-  have h_pure1 : (pure true : PMF Bool) true = 1 :=
-                    PMF.pure_apply true true |>.trans (if_pos rfl)
-  have h_pure2 : (pure false : PMF Bool) true = 0 :=
-                    PMF.pure_apply false true |>.trans (if_neg (by simp))
-  simp_rw [h_pure1, h_pure2]
-  simp only [mul_one, mul_zero, add_zero, zero_add]
+  simp only [PMF.pure_apply, ↓reduceIte, mul_one, Bool.true_eq_false, mul_zero, add_zero, zero_add]
 
   -- 2. Reassemble into (Enc_dist ...).bind A form
   rw [← PMF.bind_apply, ← PMF.bind_apply]

@@ -5,6 +5,7 @@ Authors: Yasuaki Honda
 -/
 
 import PerfectSecrecy2.Defs
+import PerfectSecrecy2.GuessingGame.Defs
 import PerfectSecrecy2.GuessingGame.SmallKeySpace
 import PerfectSecrecy2.GuessingGame.ENNRealCalc
 import Mathlib.Probability.ProbabilityMassFunction.Monad
