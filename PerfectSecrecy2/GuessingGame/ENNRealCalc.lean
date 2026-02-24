@@ -7,6 +7,8 @@ Authors: Yasuaki Honda
 import Mathlib.Data.ENNReal.Operations
 import Mathlib.Data.ENNReal.Inv
 
+namespace PerfectSecrecy.GuessingGame
+
 /-- Helper lemma: `(1/2) * A ≠ ⊤` whenever `A ≤ 1`. -/
 lemma half_A_ne_top (A : ENNReal) (h_A_le_one : A ≤ 1) : (1/2:ENNReal) * A ≠ ⊤ := by
   rw [ne_eq]
@@ -119,3 +121,5 @@ lemma formula124 : (1/8:ENNReal) = (1/2)/4 := by
   · norm_cast
     ring
   · norm_num
+
+end PerfectSecrecy.GuessingGame

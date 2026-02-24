@@ -6,6 +6,8 @@ Authors: Yasuaki Honda
 import PerfectSecrecy2.Defs
 import Mathlib.Probability.ProbabilityMassFunction.Basic
 
+namespace PerfectSecrecy.GuessingGame
+
 variable {K M C : Type}
 
 open PerfectSecrecy
@@ -68,3 +70,5 @@ theorem success_prob_eq_half
 
   rw [h_sum_one]
   rw [mul_one]
+
+end PerfectSecrecy.GuessingGame
