@@ -28,6 +28,7 @@ This repository formalizes these ideas in Lean4, focusing on:
 - Equivalence theorems between different definitions
 - Consequences such as key-size bounds and insecurity under key reuse
 - The One-Time Pad (OTP) as a canonical example
+- Guessing game formulation showing how an adversary can break non-perfect secrecy ciphers
 
 It is worth noting that, in the scope of this development, **uniform key distributions are not assumed in general**.
 Except for the One-Time Pad example, all results are proved for **arbitrary key distributions**.
@@ -55,15 +56,24 @@ Namespaces and sections are used to make logical dependencies explicit and local
 .
 ├── lake-manifest.json
 ├── lakefile.toml
+├── lakefile_lean_coPilot.toml
 ├── lean-toolchain
 ├── PerfectSecrecy2
-│   ├── Defs.lean
-│   ├── Equivalences
-│   │   ├── IndPS_Eq_IndPriorPS.lean
-│   │   └── IndPS_Eq_ShannonPS.lean
-│   ├── KeyReuse.lean
-│   ├── KeySize.lean
-│   └── OTP.lean
+│   ├── Defs.lean
+│   ├── Equivalences
+│   │   ├── IndPS_Eq_IndPriorPS.lean
+│   │   ├── IndPS_Eq_ShannonPS.lean
+│   │   ├── IndPS_Eq_PerfectInd.lean
+│   │   └── PerfectInd_Eq_PerfectSimulation.lean
+│   ├── GuessingGame
+│   │   ├── BitStringCase.lean
+│   │   ├── Defs.lean
+│   │   ├── ENNRealCalc.lean
+│   │   ├── PerfectSecrecy.lean
+│   │   └── SmallKeySpace.lean
+│   ├── KeyReuse.lean
+│   ├── KeySize.lean
+│   └── OTP.lean
 ├── PerfectSecrecy2.lean
 └── README.md
 
@@ -93,6 +103,12 @@ Formal proofs of equivalence between different definitions of perfect secrecy.
 
 - `IndPS_Eq_ShannonPS.lean`  
   Equivalence between indistinguishability-based perfect secrecy and Shannon’s original definition.
+
+- `IndPS_Eq_PerfectInd.lean`  
+  Equivalence between indistinguishability-based perfect secrecy and **perfect indistinguishability**.
+
+- `PerfectInd_Eq_PerfectSimulation.lean`  
+  Equivalence between **perfect indistinguishability** and **perfect simulation**.
 
 These results justify treating the different formulations interchangeably.
 
@@ -132,6 +148,27 @@ Uniformity of the key is assumed **only** for the proof of perfect secrecy of OT
 
 ---
 
+### `GuessingGame/`
+
+Formalization of the **guessing game** framework, which characterizes non-perfect secrecy through adversarial guessing strategies.
+
+- `Defs.lean`  
+  Core definitions of the guessing game, including adversary success probabilities and winning conditions.
+
+- `PerfectSecrecy.lean`  
+  Characterization of perfect secrecy in terms of guessing game bounds, showing when an adversary cannot improve their guessing advantage.
+
+- `BitStringCase.lean`  
+  Specialized treatment for bitstring message spaces, providing concrete instantiations of guessing game results.
+
+- `SmallKeySpace.lean`  
+  Analysis of guessing games when the key space is small relative to the message space.
+
+- `ENNRealCalc.lean`  
+  Auxiliary theorems and calculations for extended non-negative real arithmetic, supporting probability computations in the guessing game framework.
+
+---
+
 ## Relation to Cryptographic Formalizations
 
 While this development is information-theoretic in nature, it is structured to resemble modern cryptographic libraries:
@@ -150,6 +187,7 @@ This makes it suitable as a foundation for future extensions toward computationa
 - Equivalence theorems: complete
 - Key-size lower bound: complete
 - OTP example: complete
+- Guessing Game examples: complete
 
 The repository is intended as a clean, minimal, and extensible reference formalization of perfect secrecy in Lean4.
 
