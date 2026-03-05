@@ -25,8 +25,7 @@ theorem ind_perfect_secrecy_imp_perfect_indistinguishability
   -- Point-wise equality for all c implies the PMFs themselves are equal.
   have h_eq : Enc_dist Enc Gen m1 = Enc_dist Enc Gen m2 := by
     apply PMF.ext
-    intro c
-    apply h_ips m1 m2 c
+    apply h_ips m1 m2
   -- If the input distributions are equal, their bind with any A is also equal.
   rw [h_eq]
 
@@ -39,27 +38,27 @@ theorem perfect_indistinguishability_imp_ind_perfect_secrecy
     [DecidableEq C] (Enc : K → M → C) (Gen : PMF K) :
     perfect_indistinguishability Enc Gen → ind_perfect_secrecy Enc Gen := by
   intro h_pi m1 m2 c
-  -- Define a probabilistic adversary A that outputs 'true' with probability 1
-  -- if the ciphertext is exactly 'c', and 'false' otherwise.
-  let A : C → PMF Bool := fun c' =>
-    if c' = c then PMF.pure true else PMF.pure false
+  -- Define a probabilistic adversary A that outputs 1 with probability 1
+  -- if the ciphertext is exactly 'c', and 0 otherwise.
+  let A : C → PMF Bit := fun c' =>
+    if c' = c then PMF.pure 1 else PMF.pure 0
 
   -- From the hypothesis, the resulting output distributions must be identical.
   have h_bind_eq := h_pi m1 m2 A
 
-  -- We evaluate the probability of the output being 'true'.
-  -- (Enc_dist m).bind A true should equal (Enc_dist m) c.
-  have h_prob (m : M) : ((Enc_dist Enc Gen m).bind A) true = (Enc_dist Enc Gen m) c := by
+  -- We evaluate the probability of the output being 1.
+  -- (Enc_dist m).bind A 1 should equal (Enc_dist m) c.
+  have h_prob (m : M) : ((Enc_dist Enc Gen m).bind A) 1 = (Enc_dist Enc Gen m) c := by
     rw [PMF.bind_apply]
     simp only [A]
-    simp only [apply_ite (fun p : PMF Bool => p true)]
+    simp only [apply_ite (fun p : PMF Bit => p 1)]
     simp only [PMF.pure_apply, ite_true]
-    simp only [Bool.true_eq_false, ↓reduceIte, mul_ite, mul_one, mul_zero, tsum_ite_eq]
+    simp only [Fin.isValue, one_ne_zero, ↓reduceIte, mul_ite, mul_one, mul_zero, tsum_ite_eq]
 
   -- Substitute the evaluations back into the equality of distributions.
   rw [← h_prob m1, ← h_prob m2]
   -- Use PMF.ext_iff or congr_fun to get the point-wise equality from the PMF equality.
-  exact congr_fun (congr_arg (fun p => p.val) h_bind_eq) true
+  exact h_bind_eq
 
 /--
 Main Theorem: Equivalence between point-wise indistinguishability and

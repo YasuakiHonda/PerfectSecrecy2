@@ -36,24 +36,24 @@ theorem perfect_indistinguishability_imp_perfect_simulatability [Inhabited M]
     intro v
     open Classical in
     -- A' is the probabilistic adversary for the reduction
-    let A' : C → PMF Bool := fun c =>
-      (A c).bind (fun v' => if v' = v then PMF.pure true else PMF.pure false)
+    let A' : C → PMF Bit := fun c =>
+      (A c).bind (fun v' => if v' = v then PMF.pure 1 else PMF.pure 0)
 
-    have h := h_ind m default A' --今日はここまで
+    have h := h_ind m default A'
+    -- congr 2
 
-    have h_prob (m' : M) : ((Enc_dist Enc Gen m').bind A') true =
+    have h_prob (m' : M) : ((Enc_dist Enc Gen m').bind A') 1 =
         ((Enc_dist Enc Gen m').bind A) v := by
       rw [PMF.bind_apply, PMF.bind_apply]
       congr with a
       rw [PMF.bind_apply]
-      simp only [apply_ite (fun p : PMF Bool => p true)]
-      simp only [PMF.pure_apply, PMF.pure_apply]; simp only [ite_true]
-      simp only [Bool.true_eq_false, ↓reduceIte, mul_ite]
-      simp only [mul_one, mul_zero, tsum_ite_eq]
+      simp only [apply_ite (fun p : PMF Bit => p 1)]
+      simp only [PMF.pure_apply, PMF.pure_apply];
+      simp only [↓reduceIte, Fin.isValue, one_ne_zero, mul_ite, mul_one, mul_zero, tsum_ite_eq]
 
     rw [← h_prob m, ← h_prob default]
-    -- Extract the probability of 'true' from the PMF equality
-    exact PMF.ext_iff.1 h true
+    -- Extract the probability of 1 from the PMF equality
+    exact h
 
   -- Step 4: Substitute and finalize the sum over Msg
   simp_rw [h_const]
@@ -73,7 +73,7 @@ theorem perfect_simulatability_imp_perfect_indistinguishability
     perfect_simulatability Enc Gen → perfect_indistinguishability Enc Gen := by
   intro h_sim m1 m2 A
   -- Instantiate simulatability with V = Bool.
-  rcases h_sim Bool A with ⟨S, h_S⟩
+  rcases h_sim Bit A with ⟨S, h_S⟩
   have h1 := h_S (PMF.pure m1)
   have h2 := h_S (PMF.pure m2)
   simp only [cipher_dist, Bind.bind, PMF.pure_bind] at h1 h2 ⊢

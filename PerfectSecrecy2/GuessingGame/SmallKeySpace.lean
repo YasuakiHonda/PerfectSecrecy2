@@ -26,10 +26,10 @@ lemma bernoulli_half (b : Bool) :
   cases b <;> simp
 
 /-- If a ciphertext `c` has nonzero probability of arising from encrypting `m1`,
-    then `m1 ∈ S Enc c`, and the proposed adversary outputs `true` with probability 1/2. -/
-lemma proposedAdversary_true_eq (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) (c : C)
+    then `m1 ∈ S Enc c`, and the proposed adversary outputs `1` with probability 1/2. -/
+lemma proposedAdversary_one_eq (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) (c : C)
     (hc : (Enc_dist Enc Gen m1) c ≠ 0) :
-    (proposedAdversary Enc m0 m1 c) true = 1/2 := by
+    (proposedAdversary Enc m0 m1 c) 1 = 1/2 := by
   -- Show m1 ∈ S Enc c by contraposition:
   -- if no key maps m1 to c, then the weighted sum over keys is zero, contradicting hc.
   have h_m1_in_S : m1 ∈ S Enc c := by
@@ -50,29 +50,41 @@ lemma proposedAdversary_true_eq (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) 
       exact h_not k h.symm
     · simp [h]
   rw [proposedAdversary, if_pos h_m1_in_S]
-  rw [bernoulli_half true]
+  change (randomBit.bind fun b => PMF.pure b) 1 = 1 / 2
+  rw [PMF.bind_apply]
+  conv_lhs => arg 1; ext a; arg 1; rw [randomBit_apply]
+  rw [ENNReal.tsum_mul_left]
+  conv_lhs => arg 2; arg 1; ext i; rw [PMF.pure_apply]
+  rw [tsum_bit]
+  simp only [one_div, Fin.isValue, one_ne_zero, ↓reduceIte, zero_add, mul_one]
 
-/-- The proposed adversary outputs `false` with probability 1/2 if `m1 ∈ S Enc c`
+/-- The proposed adversary outputs `0` with probability 1/2 if `m1 ∈ S Enc c`
     (uniform guess), or with probability 1 if `m1 ∉ S Enc c` (always correct). -/
-lemma proposedAdversary_false_eq (Enc : K → M → C) (m0 m1 : M) (c : C) :
-    (proposedAdversary Enc m0 m1 c) false =
+lemma proposedAdversary_zero_eq (Enc : K → M → C) (m0 m1 : M) (c : C) :
+    (proposedAdversary Enc m0 m1 c) 0 =
     if m1 ∈ S Enc c then 1/2 else 1 := by
   rw [proposedAdversary]
   split_ifs with h
-  · rw [bernoulli_half false]
+  · change (randomBit.bind fun b => PMF.pure b) 0 = 1 / 2
+    rw [PMF.bind_apply]
+    conv_lhs => arg 1; ext a; arg 1; rw [randomBit_apply]
+    rw [ENNReal.tsum_mul_left]
+    conv_lhs => arg 2; arg 1; ext i; rw [PMF.pure_apply]
+    rw [tsum_bit]
+    simp only [one_div, Fin.isValue, ↓reduceIte, zero_ne_one, add_zero, mul_one]
   · simp [PMF.pure_apply]
 
-/-- When `b = false` (i.e., `m0` was encrypted), the conditional success probability
+/-- When `b = 0` (i.e., `m0` was encrypted), the conditional success probability
     of the proposed adversary is `1/2 + e/2`. -/
-lemma success_prob_false (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
-    ∑' a, (Enc_dist Enc Gen m0) a * (proposedAdversary Enc m0 m1 a) false
+lemma success_prob_zero (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
+    ∑' a, (Enc_dist Enc Gen m0) a * (proposedAdversary Enc m0 m1 a) 0
                  = 1/2 + (e Enc Gen m0 m1)/2 := by
-  -- Rewrite adversary's false-output probability using proposedAdversary_false_eq
-  have rewrite_sum : ∑' c, (Enc_dist Enc Gen m0) c * (proposedAdversary Enc m0 m1 c) false
+  -- Rewrite adversary's false-output probability using proposedAdversary_zero_eq
+  have rewrite_sum : ∑' c, (Enc_dist Enc Gen m0) c * (proposedAdversary Enc m0 m1 c) 0
                   = ∑' c, (Enc_dist Enc Gen m0) c *
                     (if m1 ∈ S Enc c then 1/2 else 1) := by
     congr; ext c
-    rw [proposedAdversary_false_eq]
+    rw [proposedAdversary_zero_eq]
   rw [rewrite_sum]
   -- Split the sum into the m1-reachable part (×1/2) and unreachable part (×1)
   have split_cases : ∑' c, (Enc_dist Enc Gen m0) c * (if m1 ∈ S Enc c then 1/2 else 1)
@@ -125,22 +137,22 @@ lemma success_prob_false (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
   apply formula2
   exact e_le_one Enc Gen m0 m1
 
-/-- When `b = true` (i.e., `m1` was encrypted), the conditional success probability
+/-- When `b = 1` (i.e., `m1` was encrypted), the conditional success probability
     of the proposed adversary is `1/2`, since `m1` is always reachable from its own encryption. -/
-lemma success_prob_true (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
-    ∑' a, (Enc_dist Enc Gen m1) a * (proposedAdversary Enc m0 m1 a) true = 1/2 := by
+lemma success_prob_one (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
+    ∑' a, (Enc_dist Enc Gen m1) a * (proposedAdversary Enc m0 m1 a) 1 = 1/2 := by
   -- Replace adversary probability with 1/2:
   -- if Enc_dist c = 0 the term vanishes; otherwise use proposedAdversary_true_eq
-  have rewrite_sum_true (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
-      ∑' c, (Enc_dist Enc Gen m1) c * (proposedAdversary Enc m0 m1 c) true
+  have rewrite_sum_one (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
+      ∑' c, (Enc_dist Enc Gen m1) c * (proposedAdversary Enc m0 m1 c) 1
           = ∑' c, (Enc_dist Enc Gen m1) c * (1/2) := by
     congr; ext c
     by_cases h : (Enc_dist Enc Gen m1) c = 0
     · simp [h]
     · congr 1
-      exact proposedAdversary_true_eq Enc Gen m0 m1 c h
+      exact proposedAdversary_one_eq Enc Gen m0 m1 c h
 
-  rw [rewrite_sum_true]
+  rw [rewrite_sum_one]
   -- ENNReal.tsum_mul_right + PMF.tsum_coe: ∑ p(c) * (1/2) = (1/2) * ∑ p(c) = 1/2
   rw [ENNReal.tsum_mul_right, tsum_coe, one_mul]
 
@@ -153,8 +165,8 @@ theorem guessing_game_success_prob
   rw [guessingGame]
   simp only [Bind.bind, PMF.bind_apply, PMF.pure_apply]
   -- tsum_bool: split the outer sum over b ∈ {false, true} into two terms
-  rw [tsum_bool]
-  rw [bernoulli_half false, bernoulli_half true]
+  rw [tsum_bit]
+  rw [randomBit_apply,randomBit_apply]
   -- Expand the inner sum over b' ∈ {false, true} using tsum_fintype,
   -- so that each branch can be simplified by simp
   conv_lhs =>
@@ -164,13 +176,11 @@ theorem guessing_game_success_prob
     arg 2;arg 2; arg 1; ext c; arg 2;
     rw [tsum_fintype]
 
-  simp only [↓reduceIte, beq_true, Bool.true_eq, mul_ite, mul_one, mul_zero,
-    Fintype.univ_bool, Finset.sum_ite_eq', Finset.mem_insert, Finset.mem_singleton,
-    or_false, Bool.false_eq_true, beq_false, Bool.not_eq_eq_eq_not,
-    Bool.not_true, or_true]
+  simp only [Fin.isValue, ↓reduceIte, Bool.true_eq, beq_iff_eq, mul_ite, mul_one, mul_zero,
+    Finset.sum_ite_eq', Finset.mem_univ, one_ne_zero]
 
   -- Apply the two conditional probability lemmas and conclude with formula3
-  rw [success_prob_true, success_prob_false]
+  rw [success_prob_one, success_prob_zero]
   rw [mul_add, add_assoc]
   nth_rw 2 [add_comm]
   apply formula3

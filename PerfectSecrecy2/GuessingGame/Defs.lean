@@ -1,7 +1,9 @@
 import PerfectSecrecy2.Defs
+import PerfectSecrecy2.Defs_bit
 import PerfectSecrecy2.GuessingGame.ENNRealCalc
 import Mathlib.Probability.ProbabilityMassFunction.Monad
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
+import Mathlib.Probability.Distributions.Uniform
 
 namespace PerfectSecrecy.GuessingGame
 
@@ -36,18 +38,21 @@ lemma e_not_top (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) :
     e Enc Gen m0 m1 ≠ ⊤ := by
   exact PMF.apply_ne_top _ _
 
+
 /--
 The proposed adversary from the textbook proof.
 Given a ciphertext `c` and challenge messages `m0`, `m1`:
 - If `m1 ∈ S Enc c` (m1 is reachable from c), guess uniformly at random.
-- If `m1 ∉ S Enc c` (m1 is unreachable from c), always guess `false` (i.e., m0).
+- If `m1 ∉ S Enc c` (m1 is unreachable from c), always guess `0` (i.e., m0).
 -/
 noncomputable
-def proposedAdversary (Enc : K → M → C) (_m0 m1 : M) (c : C) : PMF Bool :=
-  if m1 ∈ S Enc c then
-    PMF.bernoulli (1/2) (by norm_num)
-  else
-    PMF.pure false
+def proposedAdversary (Enc : K → M → C) (_m0 m1 : M) (c : C) : PMF Bit :=
+  do
+    if m1 ∈ S Enc c then
+      let b ← randomBit
+      PMF.pure b
+    else
+      PMF.pure 0
 
 /--
 The guessing game experiment (IND-CPA style).
@@ -55,9 +60,10 @@ A bit `b` is chosen uniformly; the adversary sees an encryption of `m_b`
 and tries to guess `b`.
 -/
 noncomputable
-def guessingGame (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M) (A : C → PMF Bool) : PMF Bool := do
-  let b ← PMF.bernoulli (1/2) (by norm_num)
-  let c ← Enc_dist Enc Gen (if b then m1 else m0)
+def guessingGame (Enc : K → M → C) (Gen : PMF K) (m0 m1 : M)
+                 (A : C → PMF Bit) : PMF Bool := do
+  let b ← randomBit
+  let c ← Enc_dist Enc Gen (if b=0 then m0 else m1)
   let b' ← A c
   PMF.pure (b' == b)
 

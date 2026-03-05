@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yasuaki Honda
 -/
 
+import PerfectSecrecy2.Defs_bit
 import Mathlib.Probability.ProbabilityMassFunction.Monad
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
@@ -91,10 +92,11 @@ def shannon_perfect_secrecy (Enc : K → M → C) (Gen : PMF K) : Prop :=
     (cipher_dist Enc Gen Msg) c ≠ 0 → posterior Enc Gen Msg m c = Msg m
 
 /-- Perfect Indistinguishability (Probabilistic Adversary).
-    The adversary A is a probabilistic algorithm `C → PMF Bool`. -/
+    The adversary A is a probabilistic algorithm `C → PMF Bit`. -/
 def perfect_indistinguishability (Enc : K → M → C) (Gen : PMF K) : Prop :=
-  ∀ (m1 m2 : M) (A : C → PMF Bool),
-    (do let c ← (Enc_dist Enc Gen m1); A c) = (do let c ← (Enc_dist Enc Gen m2); A c)
+  ∀ (m1 m2 : M) (A : C → PMF Bit),
+    (do let c ← (Enc_dist Enc Gen m1); A c) 1 = (do let c ← (Enc_dist Enc Gen m2); A c) 1
+
 
 /-- Perfect Simulatability (Probabilistic Adversary).
     The adversary A is a probabilistic algorithm `C → PMF V`. -/

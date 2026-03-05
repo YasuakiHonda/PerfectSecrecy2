@@ -11,7 +11,7 @@ namespace PerfectSecrecy.GuessingGame
 
 variable {K M C : Type}
 
-open PerfectSecrecy
+open PerfectSecrecy.GuessingGame
 
 /--
 If a cipher satisfies `perfect_indistinguishability`, then for any adversary `A`
@@ -21,17 +21,14 @@ with probability exactly `1/2` — no better than a random guess.
 theorem success_prob_eq_half
   (Enc : K → M → C) (Gen : PMF K)
   (h_pi : perfect_indistinguishability Enc Gen)
-  (m0 m1 : M) (A : C → PMF Bool) :
+  (m0 m1 : M) (A : C → PMF Bit) :
   (guessingGame Enc Gen m0 m1 A) true = 1/2 := by
   -- 1. Expand the definition of guessingGame and PMF bind
   unfold guessingGame
-  simp only [Bind.bind]
-  simp only [PMF.bind_apply, PMF.bernoulli_apply, Bool.beq_eq_decide_eq]
-  simp only [tsum_bool]
-  simp only [one_div, cond_false, ENNReal.coe_sub, ENNReal.coe_one, ne_eq, OfNat.ofNat_ne_zero,
-    not_false_eq_true, ENNReal.coe_inv, ENNReal.coe_ofNat, ENNReal.one_sub_inv_two,
-    Bool.false_eq_true, ↓reduceIte, decide_true, Bool.true_eq_false, decide_false, cond_true]
-  simp only [PMF.pure_apply, ↓reduceIte, mul_one, Bool.true_eq_false, mul_zero, add_zero, zero_add]
+  simp only [Bind.bind,PMF.bind_apply, randomBit_apply, Bool.beq_eq_decide_eq]
+  simp only [tsum_bit]
+  simp only [↓reduceIte, Fin.isValue, decide_true, PMF.pure_apply, mul_one, one_ne_zero,
+    decide_false, Bool.true_eq_false, mul_zero, add_zero, zero_ne_one, zero_add]
 
   -- 2. Reassemble into (Enc_dist ...).bind A form
   rw [← PMF.bind_apply, ← PMF.bind_apply]
@@ -45,9 +42,9 @@ theorem success_prob_eq_half
   rw [← mul_add]
 
   -- The two outputs of A sum to 1 (total probability), so (1/2) * 1 = 1/2
-  have h_sum_one : ((Enc_dist Enc Gen m0).bind A) false +
-                   ((Enc_dist Enc Gen m0).bind A) true = 1 := by
-    rw [← tsum_bool]
+  have h_sum_one : ((Enc_dist Enc Gen m0).bind A) 0 +
+                   ((Enc_dist Enc Gen m0).bind A) 1 = 1 := by
+    rw [← tsum_bit]
     apply PMF.tsum_coe
 
   rw [h_sum_one]
