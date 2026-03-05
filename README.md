@@ -59,6 +59,7 @@ Namespaces and sections are used to make logical dependencies explicit and local
 ├── lakefile_lean_coPilot.toml
 ├── lean-toolchain
 ├── PerfectSecrecy2
+│   ├── Defs_bit.lean
 │   ├── Defs.lean
 │   ├── Equivalences
 │   │   ├── IndPS_Eq_IndPriorPS.lean
@@ -81,7 +82,7 @@ Namespaces and sections are used to make logical dependencies explicit and local
 
 ---
 
-### `Defs.lean`
+### `Defs_bit.lean, Defs.lean`
 
 Core definitions of perfect secrecy:
 
@@ -89,8 +90,9 @@ Core definitions of perfect secrecy:
 - Shannon-style perfect secrecy
 - Indistinguishability-based perfect secrecy
 - Prior-based formulations
+- Bit type is defined as Fin 2, often used in gussing games.
 
-This file provides the foundational definitions used throughout the repository.
+These files provide the foundational definitions used throughout the repository.
 
 ---
 

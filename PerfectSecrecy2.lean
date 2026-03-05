@@ -1,3 +1,4 @@
+import PerfectSecrecy2.Defs_bit
 import PerfectSecrecy2.Defs
 import PerfectSecrecy2.KeyReuse
 import PerfectSecrecy2.KeySize
