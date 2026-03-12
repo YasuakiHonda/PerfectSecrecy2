@@ -1,6 +1,5 @@
 import PerfectSecrecy2.Defs
 import PerfectSecrecy2.Defs_bit
-import PerfectSecrecy2.GuessingGame.ENNRealCalc
 import Mathlib.Probability.ProbabilityMassFunction.Monad
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 import Mathlib.Probability.Distributions.Uniform

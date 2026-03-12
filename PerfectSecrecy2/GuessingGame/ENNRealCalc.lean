@@ -10,15 +10,8 @@ import Mathlib.Data.ENNReal.Inv
 namespace PerfectSecrecy.GuessingGame
 
 /-- Helper lemma: `(1/2) * A ≠ ⊤` whenever `A ≤ 1`. -/
-lemma half_A_ne_top (A : ENNReal) (h_A_le_one : A ≤ 1) : (1/2:ENNReal) * A ≠ ⊤ := by
-  rw [ne_eq]
-  rw [ENNReal.mul_eq_top]
-  push_neg
-  norm_num
-  push_neg
-  intro h
-  rw [h] at h_A_le_one
-  contradiction
+lemma half_A_ne_top (A : ENNReal) (h_A_le_one : A ≤ 1) : (1/2:ENNReal) * A ≠ ⊤ :=
+  ENNReal.mul_ne_top (by simp) (ne_top_of_le_ne_top (by norm_num) h_A_le_one)
 
 /-- Helper lemma: `(1/2 : ENNReal) ≠ ⊤`. -/
 lemma half_ne_top : (1/2:ENNReal) ≠ ⊤ := by norm_num
@@ -28,35 +21,18 @@ Arithmetic identity in ENNReal:
 `1 / 2 * (1 - A) + A = 1 / 2 + A / 2`, valid when `A ≤ 1`.
 -/
 lemma formula1 (A : ENNReal) (h_A_le_one : A ≤ 1) : 1 / 2 * (1 - A) + A = 1 / 2 + A / 2 := by
-  rw [ENNReal.mul_sub,mul_one]
-  · rw [ENNReal.sub_add_eq_add_sub]
-    · rw [ENNReal.sub_eq_of_eq_add_rev]
-      · exact half_A_ne_top A h_A_le_one
-      · nth_rw 2 [add_comm]
-        rw [add_assoc]
-        have : A / 2 = 1 /2 * A := by
-          have h1: A / 2 = A / 2 * 1 := by
-            rw [mul_one]
-          rw [h1]
-          rw [ENNReal.mul_comm_div, mul_comm]
-        rw [this]
-        rw [← mul_add]
-        have : A + A = 2 * A := by
-          exact Eq.symm (two_mul (A))
-        rw [this]
-        rw [← mul_assoc]
-        simp only [one_div]
-        rw [ENNReal.inv_mul_cancel,one_mul]
-        · norm_num
-        · norm_num
-    · have : (1 / 2:ENNReal) * 1 = 1 / 2 := by rw [mul_one]
-      nth_rw 2 [← this]
-      rw [ENNReal.mul_le_mul_iff_right]
-      · exact h_A_le_one
-      · norm_num
-      · norm_num
-    · exact half_A_ne_top A h_A_le_one
-  · exact fun a a_1 ↦ half_ne_top
+  have hA : A ≠ ⊤ := ne_top_of_le_ne_top (by norm_num) h_A_le_one
+  rw [← ENNReal.toReal_eq_toReal_iff'
+    (ENNReal.Finiteness.add_ne_top
+      (ENNReal.mul_ne_top (by simp) (ENNReal.sub_ne_top (by norm_num))) hA)
+    (ENNReal.Finiteness.add_ne_top (by simp) (ENNReal.div_ne_top hA (by simp))),
+    ENNReal.toReal_add
+      (ENNReal.mul_ne_top (by simp) (ENNReal.sub_ne_top (by norm_num))) hA,
+    ENNReal.toReal_mul,
+    ENNReal.toReal_sub_of_le h_A_le_one (by norm_num),
+    ENNReal.toReal_add (by simp) (ENNReal.div_ne_top hA (by simp)),
+    ENNReal.toReal_div, ENNReal.toReal_ofNat, ENNReal.toReal_one]
+  norm_num; ring
 
 /--
 Arithmetic identity in ENNReal:
@@ -66,27 +42,35 @@ lemma formula2 (A : ENNReal) (h_A_le_one : A ≤ 1) : (1 - A) * (1 / 2) + A = 1 
   rw [mul_comm]
   exact formula1 A h_A_le_one
 
+private lemma half_sq_ne_top : (1/2:ENNReal) * (1/2) ≠ ⊤ :=
+  ENNReal.mul_ne_top (by simp) (by simp)
+
 /--
 Arithmetic identity in ENNReal:
 `1 / 2 * (1 / 2) + (1 / 2 * (1 / 2) + 1 / 2 * (A / 2)) = 1 / 2 + A / 4`.
 -/
 lemma formula3 (A : ENNReal) :
-        1 / 2 * (1 / 2) + (1 / 2 * (1 / 2) + 1 / 2 * (A / 2)) = 1 / 2 + A / 4 := by
-  simp only [one_div]
-  rw [← add_assoc]
-  rw [← mul_add]
-  rw [ENNReal.inv_two_add_inv_two, mul_one]
-  rw [ENNReal.add_right_inj]
-  · rw [ENNReal.div_eq_inv_mul,ENNReal.div_eq_inv_mul]
-    rw [← mul_assoc]
-    have : (1 / 2:ENNReal) = 2⁻¹ := by
-      rw [← ENNReal.inv_div]
-      · rw [div_one]
-      · norm_num
-      · norm_num
-    rw [← this]
-    rw [← ENNReal.mul_div_mul_comm] <;> norm_num
-  · norm_num
+    1 / 2 * (1 / 2) + (1 / 2 * (1 / 2) + 1 / 2 * (A / 2)) = 1 / 2 + A / 4 := by
+  rcases eq_or_ne A ⊤ with rfl | hA
+  · simp [ENNReal.top_div_of_lt_top (by norm_num : (2:ENNReal) < ⊤),
+          ENNReal.top_div_of_lt_top (by norm_num : (4:ENNReal) < ⊤)]
+  rw [← ENNReal.toReal_eq_toReal_iff'
+    (ENNReal.Finiteness.add_ne_top half_sq_ne_top
+      (ENNReal.Finiteness.add_ne_top half_sq_ne_top
+        (ENNReal.mul_ne_top (by simp) (ENNReal.div_ne_top hA (by simp)))))
+    (ENNReal.Finiteness.add_ne_top (by simp) (ENNReal.div_ne_top hA (by simp))),
+    ENNReal.toReal_add half_sq_ne_top
+      (ENNReal.Finiteness.add_ne_top half_sq_ne_top
+        (ENNReal.mul_ne_top (by simp) (ENNReal.div_ne_top hA (by simp)))),
+    ENNReal.toReal_add half_sq_ne_top
+      (ENNReal.mul_ne_top (by simp) (ENNReal.div_ne_top hA (by simp))),
+    ENNReal.toReal_add (by simp) (ENNReal.div_ne_top hA (by simp)),
+    ENNReal.toReal_mul (a := 1/2) (b := 1/2),
+    ENNReal.toReal_mul (a := 1/2) (b := A/2),
+    ENNReal.toReal_div (a := A) (b := 2),
+    ENNReal.toReal_div (a := A) (b := 4),
+    ENNReal.toReal_ofNat]
+  norm_num; ring
 
 /-- Arithmetic identity: `(5/8 : ENNReal) = 1/2 + 1/8`. -/
 lemma formula58 : (5/8 : ENNReal) = 1/2 + 1/8 := by
